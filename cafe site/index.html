@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon Brew Café | Colombo, Sri Lanka</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: '#3C2A21',
+                        cream: '#FDFBF7',
+                        beige: '#E3D5CA',
+                        terracotta: '#E07A5F',
+                        charcoal: '#333333'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-sans bg-cream text-charcoal antialiased">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2">
+                    <i class="fa-solid fa-mug-hot text-terracotta text-2xl"></i>
+                    <span class="font-serif text-2xl font-bold text-coffee">Ceylon Brew</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#about" class="nav-link">About</a>
+                    <a href="#menu" class="nav-link">Menu</a>
+                    <a href="#offers" class="nav-link">Offers</a>
+                    <a href="#gallery" class="nav-link">Gallery</a>
+                    <a href="#reservations" class="nav-link">Reservations</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                    
+                    <button id="cart-btn" class="relative p-2 text-coffee hover:text-terracotta transition-colors">
+                        <i class="fa-solid fa-shopping-bag text-xl"></i>
+                        <span id="cart-count" class="absolute top-0 right-0 -mt-1 -mr-1 bg-terracotta text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    
+                    <button onclick="toggleCart()" class="bg-terracotta text-white px-6 py-2 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        Order Now
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <button id="mobile-cart-btn" class="relative p-2 text-coffee" onclick="toggleCart()">
+                        <i class="fa-solid fa-shopping-bag text-xl"></i>
+                        <span id="mobile-cart-count" class="absolute top-0 right-0 -mt-1 -mr-1 bg-terracotta text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-coffee focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-beige shadow-lg absolute w-full">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#home" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Home</a>
+                <a href="#about" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">About</a>
+                <a href="#menu" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Menu</a>
+                <a href="#offers" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Offers</a>
+                <a href="#gallery" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Gallery</a>
+                <a href="#reservations" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Reservations</a>
+                <a href="#contact" class="block px-3 py-2 text-coffee hover:bg-beige/30 rounded-md">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden opacity-0 transition-opacity duration-300" onclick="toggleCart()"></div>
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-beige flex justify-between items-center bg-cream">
+            <h2 class="font-serif text-2xl text-coffee font-bold">Your Order</h2>
+            <button onclick="toggleCart()" class="text-charcoal hover:text-terracotta text-xl">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Cart items will be injected here -->
+            <div class="text-center text-gray-500 mt-10" id="empty-cart-msg">
+                <i class="fa-solid fa-basket-shopping text-4xl mb-3 text-beige"></i>
+                <p>Your cart is empty.</p>
+            </div>
+        </div>
+
+        <div class="border-t border-beige p-6 bg-cream">
+            <div class="flex justify-between mb-2 text-charcoal">
+                <span>Subtotal</span>
+                <span id="cart-subtotal" class="font-medium">LKR 0</span>
+            </div>
+            <div class="flex justify-between mb-6 text-charcoal">
+                <span>Delivery/Pickup Fee</span>
+                <span class="font-medium">Calculated at checkout</span>
+            </div>
+            <div class="flex justify-between mb-6 font-bold text-xl text-coffee border-t border-beige pt-4">
+                <span>Total</span>
+                <span id="cart-total">LKR 0</span>
+            </div>
+            
+            <form id="checkout-form" class="space-y-4 hidden">
+                <input type="text" id="order-name" placeholder="Full Name" required class="w-full px-4 py-2 rounded-md border border-beige focus:outline-none focus:border-terracotta">
+                <input type="tel" id="order-phone" placeholder="Phone Number" required class="w-full px-4 py-2 rounded-md border border-beige focus:outline-none focus:border-terracotta">
+                <select id="order-type" class="w-full px-4 py-2 rounded-md border border-beige focus:outline-none focus:border-terracotta bg-white">
+                    <option value="pickup">Pickup</option>
+                    <option value="delivery">Delivery</option>
+                </select>
+                <textarea id="order-address" placeholder="Delivery Address (if applicable)" class="w-full px-4 py-2 rounded-md border border-beige focus:outline-none focus:border-terracotta hidden"></textarea>
+            </form>
+
+            <button id="checkout-btn" class="w-full bg-terracotta text-white py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors shadow-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
+                Proceed to Checkout
+            </button>
+            <div id="order-success" class="hidden mt-4 text-green-600 text-center font-medium bg-green-50 p-3 rounded-md">
+                Order placed successfully! We'll contact you shortly.
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative h-screen flex items-center justify-center overflow-hidden pt-20">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=1920&h=1080&fit=crop" alt="Cafe Interior" class="w-full h-full object-cover object-center filter brightness-[0.6]">
+        </div>
+        
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto text-white">
+            <span class="block text-terracotta font-medium tracking-widest uppercase mb-4 text-sm md:text-base">Welcome to Colombo's Finest</span>
+            <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight">Good Coffee.<br>Good Food.<br>Good Moments.</h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light">Experience the perfect blend of modern café culture and warm Sri Lankan hospitality in the heart of Colombo.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#menu" class="bg-terracotta text-white px-8 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">View Menu</a>
+                <a href="#reservations" class="bg-white/20 backdrop-blur-sm border border-white/50 text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-coffee transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">Book a Table</a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <a href="#about" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+            <i class="fa-solid fa-chevron-down text-2xl opacity-70"></i>
+        </a>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2 relative">
+                    <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&h=1000&fit=crop" alt="Barista pouring coffee" class="rounded-2xl shadow-xl w-full h-[500px] object-cover">
+                    <div class="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-lg hidden md:block">
+                        <div class="flex gap-4 items-center">
+                            <div class="bg-beige w-16 h-16 rounded-full flex items-center justify-center text-terracotta text-2xl">
+                                <i class="fa-solid fa-leaf"></i>
+                            </div>
+                            <div>
+                                <p class="font-serif text-2xl font-bold text-coffee">100%</p>
+                                <p class="text-sm text-gray-500">Premium Ceylon Beans</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 space-y-6">
+                    <span class="text-terracotta font-medium tracking-wider uppercase text-sm">About Our Café</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-bold text-coffee leading-tight">A Haven for Coffee Lovers in Colombo</h2>
+                    <p class="text-charcoal leading-relaxed text-lg">
+                        Born from a passion for exceptional coffee and delicious food, Ceylon Brew Café is your cozy escape in the bustling city of Colombo. We blend modern café culture with subtle Sri Lankan inspirations to create a truly unique experience.
+                    </p>
+                    <p class="text-charcoal leading-relaxed">
+                        Whether you're looking for a quiet corner to study, a comfortable space for a business meeting, or a warm environment to catch up with family and friends, our doors are open. Enjoy our freshly prepared meals, artisanal coffee, and welcoming atmosphere.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-6 pt-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-terracotta mt-1"></i>
+                            <span class="text-coffee font-medium">Freshly Roasted Coffee</span>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-terracotta mt-1"></i>
+                            <span class="text-coffee font-medium">Sri Lankan Flavors</span>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-terracotta mt-1"></i>
+                            <span class="text-coffee font-medium">Cozy Environment</span>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-terracotta mt-1"></i>
+                            <span class="text-coffee font-medium">Free High-Speed Wi-Fi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Discover</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-coffee mt-2">Our Menu</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Carefully crafted beverages and freshly prepared meals using the finest ingredients.</p>
+            </div>
+
+            <!-- Menu Filters -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="menu-filter-btn active px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="all">All</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="coffee">☕ Coffee</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="tea">🍵 Tea</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="cold-drinks">🥤 Cold Drinks</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="breakfast">🥐 Breakfast</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="mains">🍔 Mains</button>
+                <button class="menu-filter-btn px-6 py-2 rounded-full border border-beige font-medium transition-colors" data-filter="desserts">🍰 Desserts</button>
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="menu-container">
+                <!-- Menu items will be injected by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Offers Section -->
+    <section id="offers" class="py-24 bg-beige/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Don't Miss</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-coffee mt-2">Special Offers</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Offer Card 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&h=600&fit=crop" alt="Breakfast Combo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-4 right-4 bg-terracotta text-white px-3 py-1 rounded-full text-sm font-bold">-15%</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-serif text-xl font-bold text-coffee mb-2">Morning Breakfast Combo</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Start your day right with any breakfast item and a regular coffee.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-terracotta">LKR 1,800</span>
+                            <span class="text-sm text-gray-400 line-through">LKR 2,150</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Offer Card 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=800&h=600&fit=crop" alt="Coffee and Cake" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-4 right-4 bg-terracotta text-white px-3 py-1 rounded-full text-sm font-bold">Popular</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-serif text-xl font-bold text-coffee mb-2">Coffee + Cake Delight</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Perfect afternoon treat. Choose any slice of cake and a hot beverage.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-terracotta">LKR 1,500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offer Card 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1551030173-122aabc4489c?w=800&h=600&fit=crop" alt="Student Offer" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-4 right-4 bg-terracotta text-white px-3 py-1 rounded-full text-sm font-bold">Students</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-serif text-xl font-bold text-coffee mb-2">Student Study Special</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Show your student ID for unlimited filter coffee refills and 10% off food.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-terracotta">10% OFF</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-24 bg-coffee text-cream relative overflow-hidden">
+        <!-- Decorative element -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-terracotta/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-beige/10 rounded-full blur-3xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Our Promise</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold mt-2">Why Choose Us</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-terracotta rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fa-solid fa-mug-hot"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">Quality Coffee</h3>
+                    <p class="text-gray-300 text-sm">Freshly prepared premium coffee brewed to perfection by expert baristas.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-terracotta rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">Fresh Food</h3>
+                    <p class="text-gray-300 text-sm">Fresh ingredients and carefully prepared meals full of flavor.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-terracotta rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fa-solid fa-couch"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">Cozy Atmosphere</h3>
+                    <p class="text-gray-300 text-sm">A comfortable place to relax, study, or meet friends in peace.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-terracotta rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">Great Location</h3>
+                    <p class="text-gray-300 text-sm">Conveniently located in the heart of Colombo with easy access.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 bg-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Visuals</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-coffee mt-2">Café Gallery</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 gallery-grid">
+                <!-- Gallery Images -->
+                <div class="overflow-hidden rounded-xl h-64 md:h-80 col-span-2 md:col-span-1">
+                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop" alt="Cafe Interior" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                </div>
+                <div class="overflow-hidden rounded-xl h-64 md:h-80">
+                    <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=800&h=800&fit=crop" alt="Coffee Art" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                </div>
+                <div class="overflow-hidden rounded-xl h-64 md:h-80">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&h=800&fit=crop" alt="Dessert" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                </div>
+                <div class="overflow-hidden rounded-xl h-64 md:h-80">
+                    <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&h=800&fit=crop" alt="People at cafe" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                </div>
+                <div class="overflow-hidden rounded-xl h-64 md:h-80 col-span-2 md:col-span-2">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=800&fit=crop" alt="Cafe Exterior/Seating" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Reviews</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-coffee mt-2">What Our Customers Say</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="bg-beige/20 p-8 rounded-2xl relative">
+                    <i class="fa-solid fa-quote-left text-4xl text-terracotta/20 absolute top-6 left-6"></i>
+                    <div class="flex text-terracotta mb-4 relative z-10">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 italic mb-6 relative z-10">"Beautiful atmosphere and really good coffee. A great place to spend an evening reading a book or chatting with friends."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-coffee text-white rounded-full flex items-center justify-center font-bold">AS</div>
+                        <div>
+                            <h4 class="font-bold text-coffee">Amaya S.</h4>
+                            <span class="text-sm text-gray-500">Local Guide</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review 2 -->
+                <div class="bg-beige/20 p-8 rounded-2xl relative">
+                    <i class="fa-solid fa-quote-left text-4xl text-terracotta/20 absolute top-6 left-6"></i>
+                    <div class="flex text-terracotta mb-4 relative z-10">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 italic mb-6 relative z-10">"Fresh food, friendly staff and a relaxing environment. The Sri Lankan Rice & Curry bowl is surprisingly authentic for a modern café!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-terracotta text-white rounded-full flex items-center justify-center font-bold">DK</div>
+                        <div>
+                            <h4 class="font-bold text-coffee">Dilshan K.</h4>
+                            <span class="text-sm text-gray-500">Food Blogger</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-beige/20 p-8 rounded-2xl relative">
+                    <i class="fa-solid fa-quote-left text-4xl text-terracotta/20 absolute top-6 left-6"></i>
+                    <div class="flex text-terracotta mb-4 relative z-10">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 italic mb-6 relative z-10">"One of my favorite café spots in Colombo. Perfect Wi-Fi for working remotely, and the Iced Latte is fantastic during hot days."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-coffee text-white rounded-full flex items-center justify-center font-bold">MR</div>
+                        <div>
+                            <h4 class="font-bold text-coffee">Malin R.</h4>
+                            <span class="text-sm text-gray-500">Digital Nomad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation & Contact Section -->
+    <section id="reservations" class="py-24 bg-beige/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Reservation Form -->
+                <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl">
+                    <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Book a Table</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-coffee mt-2 mb-8">Make a Reservation</h2>
+                    
+                    <form id="reservation-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                <input type="text" id="res-name" required class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                                <input type="tel" id="res-phone" required class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="res-email" class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+                                <input type="date" id="res-date" required class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Time *</label>
+                                <input type="time" id="res-time" required class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Guests *</label>
+                                <select id="res-guests" class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all bg-white">
+                                    <option>1 Person</option>
+                                    <option selected>2 People</option>
+                                    <option>3 People</option>
+                                    <option>4 People</option>
+                                    <option>5+ People</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Special Request (Optional)</label>
+                            <textarea id="res-request" rows="3" class="w-full px-4 py-3 rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-coffee text-white py-4 rounded-lg font-bold text-lg hover:bg-terracotta transition-colors shadow-md">
+                            Reserve a Table
+                        </button>
+                    </form>
+                    
+                    <div id="reservation-success" class="hidden mt-6 text-center bg-green-50 text-green-700 p-4 rounded-lg border border-green-200">
+                        <i class="fa-solid fa-circle-check text-xl mb-2"></i>
+                        <p class="font-medium">Reservation confirmed!</p>
+                        <p class="text-sm mt-1">We look forward to seeing you at Ceylon Brew Café.</p>
+                    </div>
+                </div>
+
+                <!-- Contact & Map -->
+                <div id="contact" class="flex flex-col justify-between">
+                    <div>
+                        <span class="text-terracotta font-medium tracking-wider uppercase text-sm">Get in Touch</span>
+                        <h2 class="font-serif text-3xl md:text-4xl font-bold text-coffee mt-2 mb-8">Contact & Location</h2>
+                        
+                        <div class="space-y-6 mb-10">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-terracotta shrink-0">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-coffee text-lg">Address</h4>
+                                    <p class="text-gray-600">Colombo, Sri Lanka</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-terracotta shrink-0">
+                                    <i class="fa-solid fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-coffee text-lg">Phone</h4>
+                                    <p class="text-gray-600">+94 11 XXX XXXX</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-terracotta shrink-0">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-coffee text-lg">Email</h4>
+                                    <a href="mailto:hello@ceylonbrewcafe.lk" class="text-gray-600 hover:text-terracotta transition-colors">hello@ceylonbrewcafe.lk</a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-terracotta shrink-0">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-coffee text-lg">Opening Hours</h4>
+                                    <p class="text-gray-600">Mon - Fri: 7:00 AM – 9:00 PM</p>
+                                    <p class="text-gray-600">Sat - Sun: 8:00 AM – 10:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Placeholder -->
+                    <div class="h-64 bg-gray-200 rounded-2xl overflow-hidden relative group">
+                        <!-- Use a static map image for demonstration -->
+                        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80" alt="Map" class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg font-bold text-coffee flex items-center gap-2">
+                                <i class="fa-solid fa-map-pin text-terracotta"></i>
+                                Colombo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-coffee text-cream pt-16 pb-8 border-t-4 border-terracotta">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand -->
+                <div class="space-y-4">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-mug-hot text-terracotta text-3xl"></i>
+                        <span class="font-serif text-3xl font-bold text-white">Ceylon Brew</span>
+                    </a>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Good Coffee. Good Food. Good Moments. Your premium café destination in Colombo, blending modern style with Sri Lankan warmth.
+                    </p>
+                    <div class="flex gap-4 pt-2">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta hover:text-white transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta hover:text-white transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta hover:text-white transition-colors"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta hover:text-white transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-serif font-bold text-xl mb-6 text-white relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-12 after:h-0.5 after:bg-terracotta">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#home" class="text-gray-400 hover:text-terracotta transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs"></i> Home</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-terracotta transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs"></i> About Us</a></li>
+                        <li><a href="#menu" class="text-gray-400 hover:text-terracotta transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs"></i> Menu</a></li>
+                        <li><a href="#gallery" class="text-gray-400 hover:text-terracotta transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs"></i> Gallery</a></li>
+                        <li><a href="#reservations" class="text-gray-400 hover:text-terracotta transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs"></i> Reservations</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="font-serif font-bold text-xl mb-6 text-white relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-12 after:h-0.5 after:bg-terracotta">Contact Us</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot mt-1 text-terracotta"></i>
+                            <span>Colombo, Sri Lanka</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-phone mt-1 text-terracotta"></i>
+                            <span>+94 11 XXX XXXX</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-envelope mt-1 text-terracotta"></i>
+                            <a href="mailto:hello@ceylonbrewcafe.lk" class="hover:text-white transition-colors">hello@ceylonbrewcafe.lk</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Opening Hours -->
+                <div>
+                    <h4 class="font-serif font-bold text-xl mb-6 text-white relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-12 after:h-0.5 after:bg-terracotta">Opening Hours</h4>
+                    <ul class="space-y-3">
+                        <li class="flex justify-between border-b border-white/10 pb-2 text-gray-400">
+                            <span>Monday - Friday</span>
+                            <span class="text-white">7:00 AM - 9:00 PM</span>
+                        </li>
+                        <li class="flex justify-between border-b border-white/10 pb-2 text-gray-400">
+                            <span>Saturday - Sunday</span>
+                            <span class="text-white">8:00 AM - 10:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+                <p>&copy; 2026 Ceylon Brew Café. All rights reserved.</p>
+                <div class="flex gap-4 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

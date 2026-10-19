@@ -1,0 +1,88 @@
+/* Custom styles and overrides for Tailwind */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for cleaner UI */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #FDFBF7;
+}
+::-webkit-scrollbar-thumb {
+    background: #E3D5CA;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #E07A5F;
+}
+
+/* Nav Links Hover Effect */
+.nav-link {
+    position: relative;
+    color: #3C2A21;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #E07A5F;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #E07A5F;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Menu Filter Buttons Active State */
+.menu-filter-btn {
+    background-color: transparent;
+    color: #3C2A21;
+}
+
+.menu-filter-btn:hover {
+    background-color: #E3D5CA;
+}
+
+.menu-filter-btn.active {
+    background-color: #3C2A21;
+    color: #FDFBF7;
+    border-color: #3C2A21;
+}
+
+/* Glassmorphism subtle */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Number input hidden arrows */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
